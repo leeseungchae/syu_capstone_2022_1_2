@@ -139,7 +139,8 @@ docker-*
 *.Dockerfle
 *.pt
 data/*
-core/env/*
+Core/env/*
+data/image/*
 Dockerfile
 Nginx_Dockerfile_product
 Nginx*
