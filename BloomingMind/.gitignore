@@ -128,7 +128,7 @@ dmypy.json
 .pyre/
 
 # custom
-.idea/*
+../.idea/vcs.xml
 
 *.swp
 *.swo
