@@ -138,14 +138,13 @@ docker-*
 *.conf
 *.Dockerfle
 *.pt
-
+data/*
+core/env/*
 Dockerfile
 Nginx_Dockerfile_product
 Nginx*
 *Dockerfile
 
-data/*
-env/*
 
 
 
