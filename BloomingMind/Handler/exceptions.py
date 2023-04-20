@@ -1,0 +1,2 @@
+class ImageFIleError(Exception):
+    pass
