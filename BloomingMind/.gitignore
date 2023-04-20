@@ -146,7 +146,7 @@ Nginx_Dockerfile_product
 Nginx*
 *Dockerfile
 
-
+*.json
 
 
 # stten setting
