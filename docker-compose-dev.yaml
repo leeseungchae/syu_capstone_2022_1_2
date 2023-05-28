@@ -1,0 +1,17 @@
+version: "3"
+services:
+
+  blommingmind:
+    container_name: blommingmind
+    hostname: blommingmind
+    build:
+      context: ./BloomingMind
+      dockerfile: Dockerfile
+    # image: python:3.9
+    ports:
+      - "8000:8000"
+    command: >
+      bash -c " gunicorn BloomingMind.asgi.dev:application -b 0.0.0.0:8000 -w 1  -k uvicorn.workers.UvicornWorker "
+
+    volumes:
+      - ./BloomingMind:/home/BloomingMind

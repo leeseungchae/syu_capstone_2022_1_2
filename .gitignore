@@ -132,21 +132,16 @@ dmypy.json
 
 *.swp
 *.swo
-docker-*
 
-*.docker
 *.conf
 *.Dockerfle
 *.pt
 BloomingMind/data/*
-data/*
+data/
 model/*
 Core/env/*
-data/image/*
-Dockerfile
 Nginx_Dockerfile_product
 Nginx*
-*Dockerfile
 */data/*
 *.json
 */result/*
@@ -155,9 +150,14 @@ Nginx*
 
 
 
+/BloomingMind/Log/logs/*.log
+/BloomingMind/log/error_logs/*.log
+
 # stten setting
 /BloomingMind/Log/logs/BloomingMind.log
 /BloomingMind/Log/error_logs/BloomingMind_error.log.2023-04-20
 /BloomingMind/Log/error_logs/BloomingMind_error.log.2023-05-03
 /BloomingMind/Log/error_logs/BloomingMind_error.log.2023-05-09
 /.idea/jupyter-settings.xml
+
+**/.log
