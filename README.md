@@ -1,7 +1,9 @@
 # BloomingMind
 
-BloomingMind version1 입니다.<br>
-학습 및 API (djnago) 코드가 포함되어 있습니다.
+BloomingMind Version1 입니다.<br>
+Mobilenet_v2 를 이용하여 이미지 학습 및 추론 코드 및 <br>
+APi 코드가 (Djnago) 코드가 포함 되어 있습니다.
+
 
     학습 코드 실행방법 
     
@@ -20,6 +22,6 @@ BloomingMind version1 입니다.<br>
     2. pip install -r requirements.txt
     3. gunicorn BloomingMind.asgi.dev:application -b 0.0.0.0:0000 -w 1 -k uvicorn.workers.UvicornWorker --reload
 -- - 
-    API 서버 실행 방법 (docker)
+    API 서버 실행 방법 (Docker)
     1. docker-compose -f docker-compose-dev.yaml up
 -- -
