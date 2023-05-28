@@ -10,9 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
+
 from json_environ import Environ
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 ROOT_DIR = os.path.dirname(BASE_DIR)
@@ -34,152 +36,143 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'Board.apps.BoardConfig',
-    'Core.apps.CoreConfig',
-    'Handler.apps.HandlerConfig',
-    'ImageRecognition.apps.ImagerecognitionConfig',
-    'ImageRecommend.apps.ImagerecommendConfig',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "Core.apps.CoreConfig",
+    "Handler.apps.HandlerConfig",
+    "ImageRecognition.apps.ImagerecognitionConfig",
+    "channels",
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'BloomingMind.urls'
+ROOT_URLCONF = "BloomingMind.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,  # 설정 override 하지 않기
-
+    "version": 1,
+    "disable_existing_loggers": False,  # 설정 override 하지 않기
     # Filter
-    'filters': {
-        'require_debug_false': {
-            '()': 'django.utils.log.RequireDebugFalse',     # Debug = False
+    "filters": {
+        "require_debug_false": {
+            "()": "django.utils.log.RequireDebugFalse",  # Debug = False
         },
-        'require_debug_true': {
-            '()': 'django.utils.log.RequireDebugTrue',      # Debug = True
+        "require_debug_true": {
+            "()": "django.utils.log.RequireDebugTrue",  # Debug = True
         },
     },
-
     # Formatter
-    'formatters': {
-        'django.server': {
-            '()': 'django.utils.log.ServerFormatter',
-            'format': '[{server_time}] {message}',
-            'style': "{",
+    "formatters": {
+        "django.server": {
+            "()": "django.utils.log.ServerFormatter",
+            "format": "[{server_time}] {message}",
+            "style": "{",
         },
-
-        'standard': {
-            '()': 'django.utils.log.ServerFormatter',
+        "standard": {
+            "()": "django.utils.log.ServerFormatter",
             # asctime: Current Time / levelname: Log Level / name: Logger Name / message: Stream Contents
-            'format': '\n\n%(asctime)s [%(levelname)s] %(name)s: %(message)s'
-        }
+            "format": "\n\n%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+        },
     },
-
     # Handler
-    'handlers': {
-        'console': {   # console에 로그 출력
-            'level': 'DEBUG',
-            'filters': ['require_debug_true'],
-            'class': 'logging.StreamHandler',
+    "handlers": {
+        "console": {  # console에 로그 출력
+            "level": "DEBUG",
+            "filters": ["require_debug_true"],
+            "class": "logging.StreamHandler",
         },
-
-        'django.server': {  # 개발 서버에서만 동작
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'standard',
+        "django.server": {  # 개발 서버에서만 동작
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "standard",
         },
-
-        'mail_admins': {
-            'level': 'ERROR',
-            'filters': ['require_debug_false'],
-            'class': 'django.utils.log.AdminEmailHandler'
+        "mail_admins": {
+            "level": "ERROR",
+            "filters": ["require_debug_false"],
+            "class": "django.utils.log.AdminEmailHandler",
         },
-
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': os.path.join(ROOT_DIR, 'Log/logs/BloomingMind.log'),
-            'when': 'midnight',
-            'interval': 1,
-            'backupCount': 30,
-            'formatter': 'standard',
-
+        "file": {
+            "level": "INFO",
+            "class": "logging.handlers.TimedRotatingFileHandler",
+            "filename": os.path.join(ROOT_DIR, "Log/logs/BloomingMind.log"),
+            "when": "midnight",
+            "interval": 1,
+            "backupCount": 30,
+            "formatter": "standard",
         },
-
-        'file_error': {
-            'level': "ERROR",
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': os.path.join(ROOT_DIR, 'Log/error_logs/BloomingMind_error.log'),
-            'when': 'midnight',
-            'interval': 1,
-            'backupCount': 30,
-            'formatter': 'standard',
-        }
+        "file_error": {
+            "level": "ERROR",
+            "class": "logging.handlers.TimedRotatingFileHandler",
+            "filename": os.path.join(ROOT_DIR, "Log/error_logs/BloomingMind_error.log"),
+            "when": "midnight",
+            "interval": 1,
+            "backupCount": 30,
+            "formatter": "standard",
+        },
     },
-
     # Logger
-    'loggers': {
-        'django': {
-            'handlers': ['console', 'mail_admins', 'file', 'file_error'],
-            'level': 'INFO',
-            'propagate': False,
+    "loggers": {
+        "django": {
+            "handlers": ["console", "mail_admins", "file", "file_error"],
+            "level": "INFO",
+            "propagate": False,
         },
-
-        'django.server': {
-            'handlers': ['django.server', 'file', 'file_error'],
-            'level': 'INFO',
-            'propagate': False,
+        "django.server": {
+            "handlers": ["django.server", "file", "file_error"],
+            "level": "INFO",
+            "propagate": False,
         },
-
-        'readeo': {
-            'handlers': ['mail_admins', 'file', 'file_error'],
-            'level': 'INFO',
-        }
-    }
+        "readeo": {
+            "handlers": ["mail_admins", "file", "file_error"],
+            "level": "INFO",
+        },
+    },
 }
 
 
-
-
-WSGI_APPLICATION = 'BloomingMind.wsgi.application'
+WSGI_APPLICATION = "BloomingMind.wsgi.application"
 
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
+}
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
 }
 
 
@@ -188,16 +181,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -205,9 +198,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'ko'
+LANGUAGE_CODE = "ko"
 
-TIME_ZONE = 'Asia/Seoul'
+TIME_ZONE = "Asia/Seoul"
 
 USE_I18N = True
 
@@ -217,9 +210,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
