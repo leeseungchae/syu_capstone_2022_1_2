@@ -150,6 +150,7 @@ Nginx*
 */data/*
 *.json
 */result/*
+.idea/*
 
 
 
