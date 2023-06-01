@@ -5,12 +5,25 @@ from math import floor
 
 import pandas as pd
 
+from mobilev2.utils import file_download
+
 # Set the path to the original folder containing image folders
 original_folder = "./data/original"
 train_folder = "./data/train"
 test_folder = "./data/test"
 
+# if not os.path.exists(env_path):
+#     os.makedirs(os.path.join(ROOT_DIR, 'Core', 'env'), exist_ok=True)
+#     write_random_secret_key()
+if not os.path.exists(original_folder):
+    os.makedirs(os.path.join(original_folder))
+    file_download()
+else:
+    subfolders = [f.name for f in os.scandir(original_folder) if f.is_dir()]
+    if subfolders == []:
+        file_download()
 folder_list = os.listdir(original_folder)
+
 
 names = []
 labels = []

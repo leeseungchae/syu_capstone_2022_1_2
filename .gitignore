@@ -8,7 +8,6 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
 develop-eggs/
 dist/
 downloads/
@@ -101,12 +100,9 @@ celerybeat-schedule
 celerybeat.pid
 
 # SageMath parsed files
-*.env
 # Environments
-.env
 .venv
 venv/
-env.bak/
 venv.bak/
 
 # Spyder project settings
@@ -136,17 +132,13 @@ dmypy.json
 *.conf
 *.Dockerfle
 *.pt
-BloomingMind/data/*
-data/
-model/*
-Core/env/*
 Nginx_Dockerfile_product
 Nginx*
-*/data/*
-*.json
-*/result/*
 .idea/
-
+*.jpg
+*.bmp
+*.jpeg
+*.png
 
 
 

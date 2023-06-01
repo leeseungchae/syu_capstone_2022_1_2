@@ -12,7 +12,9 @@ logger = logging.getLogger("BloomingMind")
 
 
 class HandleFileUploadView(View):
-    """STT View"""
+    """
+        Upload View
+    """
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -21,13 +23,13 @@ class HandleFileUploadView(View):
     def post(self, request: HttpRequest) -> HttpResponse:
         """
         이미지 업로드 요청 API
-        Args:
-            request(HttpRequest): 이미지 파일이 포함된 요청
+            Args:
+                request (HttpRequest): 이미지 파일이 포함된 요청
 
-        Returns:
-            JsonResponse: 성공시 (200 OK)
-            JsonResponse: 잘못된 요청 (404 error)
-            JsonResponse: 실패시 (402 error)
+            Returns:
+                JsonResponse: 성공시 (200 OK)
+                JsonResponse: 잘못된 요청 (404 error)
+                JsonResponse: 실패시 (402 error)
 
         """
         try:
@@ -38,11 +40,14 @@ class HandleFileUploadView(View):
                 logger.info(message)
 
                 image_reco = ImageRecognizer(image_path)
-                message = "Get started with image analysis"
+                message = "[Get started] with image analysis"
                 logger.info(message)
 
                 pred = image_reco.inference()
-                message = "Finish analyzing the image"
+                message = "[Finish] analyzing the image"
+                logger.info(message)
+
+                message = f"[Result] The analyzed image is named '{pred}'."
                 logger.info(message)
 
                 if not pred:
@@ -77,11 +82,11 @@ class HandleFileUploadView(View):
 def image_conversion(image: str):
     """
     이미지 파일을 변환 하는 함수
-    Args:
-        image(str): 이미지 파일
+        Args:
+            image(str): 이미지 파일 이름
 
-    Returns:
-        image_bytes
+        Returns:
+            image_bytes
     """
     from io import BytesIO
 
@@ -94,11 +99,11 @@ def image_conversion(image: str):
 def is_image_file(image_name):
     """
     파일 확장자 검사 하는 함수
-    Args:
-        image_name(str): 이미지 파일 이름
+        Args:
+            image_name(str): 이미지 파일 이름
 
-    Returns:
-        True or False
+        Returns:
+            True or False
     """
     image_extensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".tif"]
 
@@ -115,11 +120,11 @@ def is_image_file(image_name):
 def image_save(image_file: str) -> str:
     """
     업로드 된 이미지를 저장하는 함수
-    Args:
-        image_file(str): byte 으로 이루 어진 이미지 파일
+        Args:
+            image_file(str): byte 으로 이루 어진 이미지 파일
 
-    Returns:
-        image_path(str): 이미지 파일이 저장된 path (uuid)
+        Returns:
+            image_path(str): 이미지 파일이 저장된 path (uuid)
     """
     import uuid
 
@@ -135,7 +140,7 @@ def image_save(image_file: str) -> str:
     os.makedirs(save_path, exist_ok=True)
     try:
         with open(
-            os.path.join(save_path, str(uuid_name) + ".jpg"), "wb+"
+                os.path.join(save_path, str(uuid_name) + ".jpg"), "wb+"
         ) as image_write:
             if image_name.endswith(("jp", "jpeg")):
                 image_bytes = image_conversion(image_file)

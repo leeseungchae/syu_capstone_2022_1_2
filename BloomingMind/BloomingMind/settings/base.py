@@ -15,6 +15,8 @@ from pathlib import Path
 # from .utils import write_random_secret_key
 from json_environ import Environ
 
+from BloomingMind.settings.utils import write_random_secret_key
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 ROOT_DIR = os.path.dirname(BASE_DIR)
