@@ -10,7 +10,6 @@ from django.core.management.utils import get_random_secret_key
 def write_random_secret_key():
     secret_key = get_random_secret_key()
     save_path = os.path.join(ROOT_DIR, "Core/env/env.json")
-    print(save_path)
     data = {
         "SECRET_KEY": secret_key
     }
