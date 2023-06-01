@@ -12,14 +12,20 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 import os
 from pathlib import Path
-
+# from .utils import write_random_secret_key
 from json_environ import Environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 ROOT_DIR = os.path.dirname(BASE_DIR)
+
 env_path = os.path.join(ROOT_DIR, "Core/env/env.json")
-env = Environ(path=env_path)
+
+if not os.path.exists(env_path):
+    os.makedirs(os.path.join(ROOT_DIR, 'Core', 'env'),exist_ok=True)
+    write_random_secret_key()
+
+env = Environ(path=os.path.join(env_path))
 SECRET_KEY = env("SECRET_KEY")
 
 # Quick-start development settings - unsuitable for production
@@ -148,7 +154,7 @@ LOGGING = {
             "level": "INFO",
             "propagate": False,
         },
-        "readeo": {
+        "BloomingMind": {
             "handlers": ["mail_admins", "file", "file_error"],
             "level": "INFO",
         },
