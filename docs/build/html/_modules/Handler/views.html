@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="ko" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Handler.views &mdash; BloomingMind 1.0 문서</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+    <![endif]-->
+  
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/sphinx_highlight.js"></script>
+        <script src="../../_static/translations.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="색인" href="../../genindex.html" />
+    <link rel="search" title="검색" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            BloomingMind
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">A</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../Core.html">Core package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../Handler.html">Handler package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../ImageRecognition.html">ImageRecognition package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">BloomingMind</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">BloomingMind</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">모듈 코드</a></li>
+      <li class="breadcrumb-item active">Handler.views</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Handler.views의 소스 코드</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Create your views here.</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpRequest</span><span class="p">,</span> <span class="n">HttpResponse</span><span class="p">,</span> <span class="n">JsonResponse</span>
+<span class="kn">from</span> <span class="nn">django.views</span> <span class="kn">import</span> <span class="n">View</span>
+<span class="kn">from</span> <span class="nn">django.views.decorators.csrf</span> <span class="kn">import</span> <span class="n">csrf_exempt</span>
+<span class="kn">from</span> <span class="nn">Handler.exceptions</span> <span class="kn">import</span> <span class="n">ImageFIleError</span>
+<span class="kn">from</span> <span class="nn">ImageRecognition.service</span> <span class="kn">import</span> <span class="n">ImageRecognizer</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;BloomingMind&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="HandleFileUploadView"><a class="viewcode-back" href="../../Handler.html#Handler.views.HandleFileUploadView">[문서]</a><span class="k">class</span> <span class="nc">HandleFileUploadView</span><span class="p">(</span><span class="n">View</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Upload View&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="nd">@csrf_exempt</span>
+    <span class="k">def</span> <span class="nf">post</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">HttpRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HttpResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        이미지 업로드 요청 API</span>
+<span class="sd">        Args:</span>
+<span class="sd">            request(HttpRequest): 이미지 파일이 포함된 요청</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            JsonResponse: 성공시 (200 OK)</span>
+<span class="sd">            JsonResponse: 잘못된 요청 (404 error)</span>
+<span class="sd">            JsonResponse: 실패시 (402 error)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">FILES</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]:</span>
+                <span class="n">image_file</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">FILES</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]</span>
+                <span class="n">image_path</span> <span class="o">=</span> <span class="n">image_save</span><span class="p">(</span><span class="n">image_file</span><span class="o">=</span><span class="n">image_file</span><span class="p">)</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;Image upload Success&quot;</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+                <span class="n">image_reco</span> <span class="o">=</span> <span class="n">ImageRecognizer</span><span class="p">(</span><span class="n">image_path</span><span class="p">)</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;[Get started] with image analysis&quot;</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+                <span class="n">pred</span> <span class="o">=</span> <span class="n">image_reco</span><span class="o">.</span><span class="n">inference</span><span class="p">()</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;[Finish] analyzing the image&quot;</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+                <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;[Result] The analyzed image is named &#39;</span><span class="si">{</span><span class="n">pred</span><span class="si">}</span><span class="s2">&#39;.&quot;</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">pred</span><span class="p">:</span>
+                    <span class="n">pred</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                    <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;I&#39;m having trouble recognizing images&quot;</span>
+
+                <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span>
+                    <span class="p">{</span><span class="s2">&quot;status_code&quot;</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span> <span class="s2">&quot;image_name&quot;</span><span class="p">:</span> <span class="n">pred</span><span class="p">,</span> <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="n">message</span><span class="p">},</span>
+                    <span class="n">status</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;status_code&quot;</span><span class="p">:</span> <span class="mi">404</span><span class="p">,</span>
+                        <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;It&#39;s not an image&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Please upload the image&quot;</span><span class="p">,</span>
+                    <span class="p">},</span>
+                    <span class="n">status</span><span class="o">=</span><span class="mi">404</span><span class="p">,</span>
+                <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="kn">import</span> <span class="nn">traceback</span>
+
+            <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">JsonResponse</span><span class="p">(</span>
+                <span class="p">{</span><span class="s2">&quot;status_code&quot;</span><span class="p">:</span> <span class="mi">402</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Upload failed&quot;</span><span class="p">},</span>
+                <span class="n">status</span><span class="o">=</span><span class="mi">402</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="image_conversion"><a class="viewcode-back" href="../../Handler.html#Handler.views.image_conversion">[문서]</a><span class="k">def</span> <span class="nf">image_conversion</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    이미지 파일을 변환 하는 함수</span>
+<span class="sd">    Args:</span>
+<span class="sd">        image(str): 이미지 파일</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        image_bytes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
+
+    <span class="n">buffer</span> <span class="o">=</span> <span class="n">BytesIO</span><span class="p">()</span>
+    <span class="n">image</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">buffer</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;JPEG&quot;</span><span class="p">)</span>
+    <span class="n">image_bytes</span> <span class="o">=</span> <span class="n">buffer</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">image_bytes</span></div>
+
+
+<div class="viewcode-block" id="is_image_file"><a class="viewcode-back" href="../../Handler.html#Handler.views.is_image_file">[문서]</a><span class="k">def</span> <span class="nf">is_image_file</span><span class="p">(</span><span class="n">image_name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    파일 확장자 검사 하는 함수</span>
+<span class="sd">    Args:</span>
+<span class="sd">        image_name(str): 이미지 파일 이름</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        True or False</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">image_extensions</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;.jpeg&quot;</span><span class="p">,</span> <span class="s2">&quot;.png&quot;</span><span class="p">,</span> <span class="s2">&quot;.gif&quot;</span><span class="p">,</span> <span class="s2">&quot;.bmp&quot;</span><span class="p">,</span> <span class="s2">&quot;.tiff&quot;</span><span class="p">,</span> <span class="s2">&quot;.tif&quot;</span><span class="p">]</span>
+
+    <span class="c1"># print(os.path.splitext(str(image_name.filename)))</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">image_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">extension</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">image_extensions</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+    <span class="c1"># return extension.lower() in image_extensions</span>
+
+
+<div class="viewcode-block" id="image_save"><a class="viewcode-back" href="../../Handler.html#Handler.views.image_save">[문서]</a><span class="k">def</span> <span class="nf">image_save</span><span class="p">(</span><span class="n">image_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    업로드 된 이미지를 저장하는 함수</span>
+<span class="sd">    Args:</span>
+<span class="sd">        image_file(str): byte 으로 이루 어진 이미지 파일</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        image_path(str): 이미지 파일이 저장된 path (uuid)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">uuid</span>
+
+    <span class="kn">from</span> <span class="nn">BloomingMind.settings.base</span> <span class="kn">import</span> <span class="n">ROOT_DIR</span>
+
+    <span class="n">image_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">image_file</span><span class="p">)</span>
+    <span class="n">filecheck</span> <span class="o">=</span> <span class="n">is_image_file</span><span class="p">(</span><span class="n">image_name</span><span class="o">=</span><span class="n">image_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">filecheck</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ImageFIleError</span><span class="p">(</span><span class="s2">&quot;This file cannot be read.&quot;</span><span class="p">)</span>
+
+    <span class="n">uuid_name</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span>
+    <span class="n">save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ROOT_DIR</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">)</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid_name</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.jpg&quot;</span><span class="p">),</span> <span class="s2">&quot;wb+&quot;</span>
+        <span class="p">)</span> <span class="k">as</span> <span class="n">image_write</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">image_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">((</span><span class="s2">&quot;jp&quot;</span><span class="p">,</span> <span class="s2">&quot;jpeg&quot;</span><span class="p">)):</span>
+                <span class="n">image_bytes</span> <span class="o">=</span> <span class="n">image_conversion</span><span class="p">(</span><span class="n">image_file</span><span class="p">)</span>
+                <span class="n">image_write</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">image_bytes</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">image_file</span><span class="o">.</span><span class="n">chunks</span><span class="p">():</span>
+                    <span class="n">image_write</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid_name</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.jpg&quot;</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ImageFIleError</span><span class="p">(</span><span class="s2">&quot;This file cannot be read.&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; 저작권 2023, chae_lee.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
