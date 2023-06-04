@@ -135,10 +135,10 @@ dmypy.json
 Nginx_Dockerfile_product
 Nginx*
 .idea/
-*.jpg
-*.bmp
-*.jpeg
-*.png
+data/*/*.jpg
+data/*/*.bmp
+data/*/*.jpeg
+data/*/*.png
 
 
 
