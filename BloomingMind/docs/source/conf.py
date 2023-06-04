@@ -30,8 +30,8 @@ autodoc_mock_imports = [
 extensions = [
     'sphinx.ext.autodoc',   # 자동 생성
     'sphinx.ext.napoleon',  # google docstring
-    'myst_parser'# md 및 확장자 파싱
-    'sphinx_rtd_theme'
+    'myst_parser',# md 및 확장자 파싱
+    'sphinx_rtd_theme',
     'sphinx.ext.githubpages'
     # 'sphinx.ext.viewcode'
 
