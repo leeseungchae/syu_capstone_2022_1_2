@@ -15,8 +15,10 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, Dataset
 from torchvision import models, transforms
 from tqdm.notebook import tqdm
-
+import wandb
+import random
 # Number of classes in the dataset
+
 
 feature_extract = True
 
@@ -28,7 +30,7 @@ def train_model(
     optimizer,
     device,
     num_epochs=25,
-    save_interval=5,
+    save_interval=1,
     patience=5,
 ):
     since = time.time()
@@ -38,10 +40,28 @@ def train_model(
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
 
+    wandb.init(
+        # set the wandb project where this run will be logged
+        project="syu-capstone-BloomingMind",
+
+        # track hyperparameters and run metadata
+        config={
+            "architecture": "MobileNetV2",
+            "num_classes": num_classes,
+            "batch_size": batch_size,
+            "learning_rate": lr,
+            "momentum": momentum,
+            "epochs": num_epochs,
+        }
+    )
+
     early_stopping_counter = 0  # Counter to track early stopping
     early_stopping_flag = False  # Flag to indicate early stopping
-
+    # offset = random.random() / 5\
+    train_step = 0
+    val_step = 0
     for epoch in range(num_epochs):
+
         print("Epoch {}/{}".format(epoch, num_epochs - 1))
         print("-" * 10)
 
@@ -49,17 +69,16 @@ def train_model(
         for phase in ["train", "val"]:
             if phase == "train":
                 model.train()  # Set model to training mode
+                step = train_step
             else:
                 model.eval()  # Set model to evaluate mode
+                step = val_step
 
             running_loss = 0.0
             running_corrects = 0
 
-            # Iterate over data
-            for inputs, labels in tqdm(dataloaders[phase]):
-                inputs = inputs.to(device)
-                labels = labels.to(device)
-
+            for batch in dataloaders[phase]:
+                inputs, labels = batch[0].to(device), batch[1].to(device)
                 optimizer.zero_grad()
 
                 with torch.set_grad_enabled(phase == "train"):
@@ -83,15 +102,30 @@ def train_model(
             if phase == "val":
                 history["val_accuracy"].append(epoch_acc.item())
                 history["val_loss"].append(epoch_loss)
-
-                # Early stopping check
-                if epoch_acc <= best_acc:
-                    early_stopping_counter += 1
-                    if early_stopping_counter >= patience:
-                        early_stopping_flag = True
             else:
                 history["accuracy"].append(epoch_acc.item())
                 history["loss"].append(epoch_loss)
+            # wandb.log({f"{phase}_epoch": epoch, f"{phase}_loss": epoch_loss, f"{phase}_accuracy": epoch_acc.item()})
+            wandb.log(
+                {f"{phase}_loss": epoch_loss, f"{phase}_accuracy": epoch_acc.item()},
+                step=step
+            )
+
+            if phase == "train":
+                train_step += 1
+            else:
+                val_step += 1
+            # wandb.log({f"{phase}_epoch": epoch, f"{phase}_loss": epoch_loss})
+            # wandb.log({f"{phase}_accuracy": epoch_acc.item()})
+        # if phase == "val":
+        #     wandb.log({f"{phase}_accuracy": epoch_acc.item()})
+                # Early stopping check
+            if epoch_acc <= best_acc:
+                early_stopping_counter += 1
+                if early_stopping_counter >= patience:
+                    early_stopping_flag = True
+            # else:
+            #     wandb.log({f"{phase}_accuracy": epoch_acc.item()})
 
             if phase == "val" and epoch_acc > best_acc:
                 best_acc = epoch_acc
@@ -131,10 +165,21 @@ if __name__ == "__main__":
     # config
     batch_size = 32
     num_epochs = 50
+    lr = 0.001
+    momentum = 0.9
     num_workers = multiprocessing.cpu_count()
     num_classes = len(df["labels"])
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    # Create training and validation dataloaders
+    model_ft = models.mobilenet_v2(pretrained=True)
+    model_ft.classifier[1] = nn.Linear(1280, num_classes)
+
+    model_ft = model_ft.to(device)
+    params_to_update = model_ft.parameters()
+    optimizer_ft = optim.SGD(params_to_update, lr=lr, momentum=momentum)
+    criterion = nn.CrossEntropyLoss()
+    print("Params to learn:")
+
     dataloaders_dict = {
         x: DataLoader(
             image_datasets[x],
@@ -144,24 +189,6 @@ if __name__ == "__main__":
         )
         for x in ["train", "val"]
     }
-
-    model_ft = models.mobilenet_v2(pretrained=True)
-    model_ft.classifier[1] = nn.Linear(1280, num_classes)
-    # mac
-    device = torch.device("mps") if torch.backends.mps.is_available() else "cpu"
-    print(device)
-    # mac 제외
-    # device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    # Send the model to GPU
-    model_ft = model_ft.to(device)
-
-    params_to_update = model_ft.parameters()
-    print("Params to learn:")
-
-    # Observe that all parameters are being optimizedss
-    optimizer_ft = optim.SGD(params_to_update, lr=0.001, momentum=0.9)
-
-    criterion = nn.CrossEntropyLoss()
 
     # Train and evaluate
     model_ft, hist = train_model(

@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog
 
 from PIL import Image
+import torch
 
 from mobilev2.utils import create_transforms
 
@@ -49,9 +50,18 @@ num_classes = len(
 model.classifier[1] = torch.nn.Linear(1280, num_classes)
 
 # Load the saved model weights
-model.load_state_dict(torch.load(save_path))
+# model.load_state_dict(torch.load(save_path), map_location=torch.device("cpu"))
+
+
+model.load_state_dict(
+            torch.load(
+                (save_path),
+                map_location=torch.device("cpu"),
+            )
+        )
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
 
 model = model.to(device)
 model.eval()
@@ -82,9 +92,23 @@ with torch.no_grad():
     img = img.to(device)
 
     outputs = model(img)
-    max_index = torch.argmax(outputs)
-    key = search_key(max_index.item())
+    topk_values, topk_indices = torch.topk(outputs, k=5)
+    print(topk_values)
+    # 백분율 형식
+    probabilities_percentage = topk_values * 10
+    # print("백분율 형식:")
+    # print(probabilities_percentage.tolist())
+    # print(topk_indices.tolist())
+    result_dict = {}
+    print("백분율 형식:")
+    for prob, idx in zip(probabilities_percentage[0], topk_indices[0]):
+        key = search_key(idx)
+        value = round(prob.item(), 2)
+        print(f"{key}: {value}")
+        result_dict[key] = value
 
-    probability = outputs[0, max_index].item()
-
-    print(f"이꽃의 이름은 {(round(probability * 10))}%의 확률로 {key}일 것 같습니다")
+    print(result_dict)
+    # max_index = torch.argmax(outputs)
+    # probability = outputs[0, max_index].item()
+    #
+    # print(f"이꽃의 이름은 {(round(probability * 10))}%의 확률로 {key}일 것 같습니다")

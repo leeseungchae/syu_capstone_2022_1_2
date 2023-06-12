@@ -5,6 +5,7 @@ import os
 from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
+
 from Handler.exceptions import ImageFIleError
 from ImageRecognition.service import ImageRecognizer
 
@@ -13,7 +14,7 @@ logger = logging.getLogger("BloomingMind")
 
 class HandleFileUploadView(View):
     """
-        Upload View
+    Upload View
     """
 
     def __init__(self, **kwargs):
@@ -47,15 +48,15 @@ class HandleFileUploadView(View):
                 message = "[Finish] analyzing the image"
                 logger.info(message)
 
-                message = f"[Result] The analyzed image is named '{pred}'."
-                logger.info(message)
+                # message = f"[] The analyzed image is named '{pred}'."
+                # logger.info(message)
 
                 if not pred:
                     pred = ""
                     message = "I'm having trouble recognizing images"
 
                 return JsonResponse(
-                    {"status_code": 200, "image_name": pred, "message": message},
+                    {"status_code": 200, "pred": pred, "message": message},
                     status=200,
                 )
 
@@ -140,7 +141,7 @@ def image_save(image_file: str) -> str:
     os.makedirs(save_path, exist_ok=True)
     try:
         with open(
-                os.path.join(save_path, str(uuid_name) + ".jpg"), "wb+"
+            os.path.join(save_path, str(uuid_name) + ".jpg"), "wb+"
         ) as image_write:
             if image_name.endswith(("jp", "jpeg")):
                 image_bytes = image_conversion(image_file)

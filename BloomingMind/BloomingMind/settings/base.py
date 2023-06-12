@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 import os
 from pathlib import Path
+
 # from .utils import write_random_secret_key
 from json_environ import Environ
 
@@ -24,7 +25,7 @@ ROOT_DIR = os.path.dirname(BASE_DIR)
 env_path = os.path.join(ROOT_DIR, "Core/env/env.json")
 
 if not os.path.exists(env_path):
-    os.makedirs(os.path.join(ROOT_DIR, 'Core', 'env'),exist_ok=True)
+    os.makedirs(os.path.join(ROOT_DIR, "Core", "env"), exist_ok=True)
     write_random_secret_key()
 
 env = Environ(path=os.path.join(env_path))

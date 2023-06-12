@@ -1,15 +1,15 @@
 import os
+import urllib.request
 import warnings
 
 import pandas as pd
 import torch
-from ImageRecognition.src.utils import create_transforms
 from PIL import Image
 from torchvision import models
-import urllib.request
-from ImageRecognition import model_url
 
 from BloomingMind.settings.base import ROOT_DIR
+from ImageRecognition import model_url
+from ImageRecognition.src.utils import create_transforms
 
 # Disable all warnings
 warnings.filterwarnings("ignore")
@@ -26,7 +26,6 @@ class ImageRecognizer:
     """
 
     def __init__(self, image_path) -> None:
-
         self.label_dict = None
         self.model = None
         self.image_path = image_path
@@ -46,7 +45,9 @@ class ImageRecognizer:
         if os.path.exists(model_path):
             pass
         else:
-            os.makedirs(os.path.join(ROOT_DIR, "ImageRecognition", "model"), exist_ok=True)
+            os.makedirs(
+                os.path.join(ROOT_DIR, "ImageRecognition", "model"), exist_ok=True
+            )
             urllib.request.urlretrieve(model_url, model_path)
 
         self.model.load_state_dict(
@@ -57,7 +58,7 @@ class ImageRecognizer:
         )
         self.model = self.model.to(self.device)
 
-    def search_key(self, index: str) -> str:
+    def search_key(self, index: int):
         """
         가장 확률이 높은 인덱스 를 가지고 key 값을 찾는 함수
             Args:
@@ -86,16 +87,18 @@ class ImageRecognizer:
         transform_dict = create_transforms(inference=True)
         data_transform = transform_dict["inference"]
 
+        result_dict = {}
+
         with torch.no_grad():
             img = Image.open(self.image_path).convert("RGB")
             img = data_transform(img)
             img = img.unsqueeze(0)
             img = img.to(self.device)
             outputs = self.model(img)
-            max_index = torch.argmax(outputs)
-            key = self.search_key(max_index.item())
-            probability = outputs[0, max_index].item()
-            if round(probability * 10) > 7:
-                return key
-            else:
-                return False
+            topk_values, topk_indices = torch.topk(outputs, k=5)
+            probabilities_percentage = topk_values * 10
+            for prob, idx in zip(probabilities_percentage[0], topk_indices[0]):
+                key = self.search_key(idx)
+                value = round(prob.item(), 2)
+                result_dict[key] = value
+        return result_dict

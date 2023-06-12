@@ -20,7 +20,7 @@ if not os.path.exists(original_folder):
     file_download()
 else:
     subfolders = [f.name for f in os.scandir(original_folder) if f.is_dir()]
-    if subfolders == []:
+    if not subfolders:
         file_download()
 folder_list = os.listdir(original_folder)
 

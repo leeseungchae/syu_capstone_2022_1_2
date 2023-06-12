@@ -84,3 +84,5 @@ def file_download():
 
     shutil.rmtree(os.path.join(target_folder, 'flowers'))
     os.remove(save_path)
+
+
